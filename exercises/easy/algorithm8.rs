@@ -51,33 +51,67 @@ impl<T> Default for Queue<T> {
         }
     }
 }
-
 pub struct myStack<T>
 {
-	//TODO
-	q1:Queue<T>,
-	q2:Queue<T>
+    //TODO
+    q1:Queue<T>,
+    q2:Queue<T>,
+    select_queue:bool
 }
 impl<T> myStack<T> {
     pub fn new() -> Self {
         Self {
-			//TODO
-			q1:Queue::<T>::new(),
-			q2:Queue::<T>::new()
+            //TODO
+            q1:Queue::<T>::new(),
+            q2:Queue::<T>::new(),
+            select_queue:true
         }
     }
     pub fn push(&mut self, elem: T) {
         //TODO
+        if self.select_queue {
+            self.q1.enqueue(elem);
+        } else {
+            self.q2.enqueue(elem);
+        }
     }
     pub fn pop(&mut self) -> Result<T, &str> {
         //TODO
-		Err("Stack is empty")
+        if self.select_queue {
+            if self.q1.is_empty() {
+                return Err("Stack is empty");
+            }
+            while self.q1.size() > 1 {
+                let temp = self.q1.dequeue().unwrap();
+                self.q2.enqueue(temp);
+            }
+            let temp = self.q1.dequeue().unwrap();
+            self.select_queue = !self.select_queue;
+            return Ok(temp);
+        } else {
+            if self.q2.is_empty() {
+                return Err("Stack is empty");
+            }
+            while self.q2.size() > 1 {
+                let temp = self.q2.dequeue().unwrap();
+                self.q1.enqueue(temp);
+            }
+            let temp = self.q2.dequeue().unwrap();
+            self.select_queue = !self.select_queue;
+            return Ok(temp);
+        }
+        Err("Stack is empty")
     }
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        //TODO
+        if self.select_queue {
+            return self.q1.is_empty();
+        } else {
+            return self.q2.is_empty();
+        }
     }
 }
+
 
 #[cfg(test)]
 mod tests {
